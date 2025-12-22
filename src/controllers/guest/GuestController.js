@@ -65,8 +65,8 @@ class GuestController {
                 return res.status(httpStatus.OK).json({ message: 'Success', accessToken: accessToken });
             }
             return res.status(httpStatus.BAD_GATEWAY).json({ message: 'Fail' });
-        } catch {
-            return res.status(httpStatus.BAD_GATEWAY).json({ message: 'Fail' });
+        } catch (e){
+            return res.status(httpStatus.BAD_GATEWAY).json({ message: e.message});
         }
     }
     async findProductByName(req, res) {
