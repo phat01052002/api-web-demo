@@ -50,16 +50,6 @@ class GuestController {
     }
     async webhookWebEngagement(req, res) {
         try {
-            const fs = require('fs');
-            const timeLog = new Date().toLocaleString('vi-VN');
-            const content = `[${timeLog}] \n${JSON.stringify(req.body, null, 2)}`;
-            fs.appendFile('webhook_logs.txt', content, (err) => {
-                if (err) {
-                    console.error('Lỗi khi ghi file:', err);
-                } else {
-                    console.log('Đã lưu log vào file webhook_logs.txt');
-                }
-            });
             return res.status(200).json({ message: 'Success' });
         } catch (error) {
             return res.status(500).json({ error: 'internal_error' });
