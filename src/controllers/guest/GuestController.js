@@ -13,11 +13,9 @@ import CategoryRepository from '../../repositories/CategoryRepository.js';
 import AnnouncementService from '../../services/AnnouncementService.js';
 import BannerService from '../../services/BannerService.js';
 import axios from 'axios';
-
 class GuestController {
     initRoutes(app) {
         app.post('/webhook/web-engagement', this.webhookWebEngagement);
-
         app.get('/api/sfAccessToken', this.sfAccessToken);
         app.get('/api/categories', this.findAllCategories);
         app.get('/api/category/:categoryId', this.findCategoryById);
@@ -52,19 +50,17 @@ class GuestController {
     }
     async webhookWebEngagement(req, res) {
         try {
-            console.log('----- NHẬN WEBHOOK TỪ SALESFORCE -----');
-
-            // Dùng JSON.stringify để in object lồng nhau cho dễ nhìn
-            console.log(JSON.stringify(req.body, null, 2));
-
-            // Logic xử lý của bạn ở đây (VD: Socket.emit...)
-
-            // [QUAN TRỌNG] Phải trả về 200 OK ngay lập tức
-            return res.status(200).json({ status: 'success' });
+            const timeLog = new Date().toLocaleString('vi-VN');
+            const content = `[${timeLog}] \n${JSON.stringify(req.body, null, 2)}`;
+            fs.appendFile('webhook_logs.txt', content, (err) => {
+                if (err) {
+                    console.error('Lỗi khi ghi file:', err);
+                } else {
+                    console.log('Đã lưu log vào file webhook_logs.txt');
+                }
+            });
+            return res.status(200).json({ message: 'Success'});
         } catch (error) {
-            console.error('Lỗi xử lý webhook:', error);
-            // Vẫn nên trả về 200 hoặc 500 tùy logic,
-            // nhưng thường trả 200 để Salesforce không spam retry nếu lỗi do code mình.
             return res.status(500).json({ error: 'internal_error' });
         }
     }
