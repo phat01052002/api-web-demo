@@ -15,6 +15,7 @@ import BannerService from '../../services/BannerService.js';
 
 class GuestController {
     initRoutes(app) {
+        app.get('/api/sfAccessToken', this.sfAccessToken);
         app.get('/api/categories', this.findAllCategories);
         app.get('/api/category/:categoryId', this.findCategoryById);
         app.get('/api/products', this.findAllProducts);
@@ -46,7 +47,28 @@ class GuestController {
         app.post('/api/search-product-by-name', this.findProductByName);
         app.post('/api/search/product-by-name-and-category', this.searchProductByName);
     }
+    async sfAccessToken(req, res) {
+        try {
+            let config = {
+                method: 'post',
+                maxBodyLength: Infinity,
+                url: `https://trailsignup-145183137f0ca1.lightning.force.com/services/oauth2/token?client_id=${process.env.SF_CLIENT}&client_secret=${process.env.SF_SECRET}&grant_type=client_credentials`,
+                headers: {
+                    Cookie: 'BrowserId=5TxKi9yqEfC9IJFS4Nb0Ww; CookieConsentPolicy=0:1; LSKey-c$CookieConsentPolicy=0:1',
+                },
+            };
 
+            const req = await axios.request(config);
+
+            if (req) {
+                const accessToken = req.data.access_token;
+                return res.status(httpStatus.OK).json({ message: 'Success', accessToken: accessToken });
+            }
+            return res.status(httpStatus.BAD_GATEWAY).json({ message: 'Fail' });
+        } catch {
+            return res.status(httpStatus.BAD_GATEWAY).json({ message: 'Fail' });
+        }
+    }
     async findProductByName(req, res) {
         try {
             const product = await ProductService.findProductByNameForGuest(req);
