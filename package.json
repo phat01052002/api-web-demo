@@ -1,0 +1,59 @@
+{
+    "name": "kltn-api",
+    "version": "1.0.0",
+    "description": "",
+    "main": "src/index.js",
+    "type": "module",
+    "scripts": {
+        "start": "nodemon src/index.js",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/phat01052002/KLTN-API.git"
+    },
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "@types/node": "^18.15.11",
+        "nodemon": "^3.1.7",
+        "prisma": "^5.13.0",
+        "ts-node": "^10.9.1",
+        "typescript": "^4.9.5"
+    },
+    "dependencies": {
+        "@paypal/checkout-server-sdk": "^1.0.3",
+        "@prisma/client": "^5.13.0",
+        "@vonage/server-sdk": "^3.18.0",
+        "axios": "^1.6.7",
+        "bluebird": "^3.7.2",
+        "body-parser": "^1.20.2",
+        "clicksend": "^5.0.37",
+        "cors": "^2.8.5",
+        "csv-parser": "^3.0.0",
+        "date-fns": "^4.1.0",
+        "express": "^4.21.1",
+        "global": "^4.4.0",
+        "http": "^0.0.1-security",
+        "http-status": "^1.6.2",
+        "jsonwebtoken": "^9.0.0",
+        "md5": "^2.3.0",
+        "moment": "^2.29.4",
+        "mongodb": "^6.9.0",
+        "mongoose": "^8.19.3",
+        "multer": "^1.4.5-lts.1",
+        "mysql": "^2.18.1",
+        "nexmo": "^2.9.1",
+        "node-cron": "^3.0.3",
+        "node-schedule": "^2.1.1",
+        "nodemailer": "^6.9.15",
+        "pdf-creator-node": "^2.3.5",
+        "pkce-challenge": "^4.1.0",
+        "qs": "^6.11.2",
+        "remove-accents": "^0.5.0",
+        "request": "^2.88.2",
+        "socket.io": "^4.8.1",
+        "twilio": "^5.1.0",
+        "winston": "^3.15.0"
+    }
+}
