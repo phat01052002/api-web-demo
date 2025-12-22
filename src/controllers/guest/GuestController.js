@@ -12,6 +12,7 @@ import SizeService from '../../services/SizeService.js';
 import CategoryRepository from '../../repositories/CategoryRepository.js';
 import AnnouncementService from '../../services/AnnouncementService.js';
 import BannerService from '../../services/BannerService.js';
+import axios from 'axios';
 
 class GuestController {
     initRoutes(app) {
