@@ -52,7 +52,7 @@ export const socketIo = new Server(server, {
 });
 
 socketIo.on('connection', OnConnection);
-server.listen(3051);
+server.listen(3052);
 //-------------------------------------LOG-------------------------------
 export const logger = winston.createLogger({
     level: 'info',
