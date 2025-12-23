@@ -82,10 +82,9 @@ class GuestController {
                 },
             };
             const req = await axios.request(config);
-            if (req) {
+            if (req.data.access_token) {
                 const accessToken = req.data.access_token;
                 console.log(accessToken);
-                const axios = require('axios');
                 let data = '';
 
                 let config2 = {
