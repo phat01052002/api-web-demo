@@ -86,7 +86,7 @@ class GuestController {
             const req = await axios.request(config);
             if (req) {
                 const accessToken = req.data.access_token;
-                console.log(accessToken)
+                console.log(accessToken);
                 const axios = require('axios');
                 let data = '';
 
@@ -100,9 +100,14 @@ class GuestController {
                     },
                     data: data,
                 };
-                await axios.request(config2);
+                const reqInsight = await axios.request(config2);
+                if (reqInsight.status == 200) {
+                    return res.status(200).json({ message: 'Success' });
+                } else {
+                    return res.status(500).json({ error: 'internal_error' });
+                }
             }
-            return res.status(200).json({ message: 'Success' });
+            return res.status(500).json({ error: 'internal_error' });
         } catch (error) {
             return res.status(500).json({ error: 'internal_error' });
         }
