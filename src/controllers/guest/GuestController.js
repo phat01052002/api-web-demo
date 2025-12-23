@@ -94,7 +94,7 @@ class GuestController {
                     maxBodyLength: Infinity,
                     url: 'https://trailsignup-145183137f0ca1.my.salesforce.com/services/data/v65.0/ssot/calculated-insights/web_catalog_insight__cio/actions/run',
                     headers: {
-                        Authorization: `Bearer ${req.data.access_token}`,
+                        Authorization: `Bearer ${accessToken}`,
                         Cookie: 'BrowserId=5jfBj9yqEfCwYzubw7ISIQ; CookieConsentPolicy=0:1; LSKey-c$CookieConsentPolicy=0:1',
                     },
                     data: data,
