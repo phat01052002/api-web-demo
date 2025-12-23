@@ -91,7 +91,7 @@ class GuestController {
                 let config2 = {
                     method: 'get',
                     maxBodyLength: Infinity,
-                    url: `${process.env.SF_HOST}/services/data/v65.0/ssot/insight/calculated-insights/web_catalog_insight_realtime__cio`,
+                    url: `https://trailsignup-145183137f0ca1.my.salesforce.com/services/data/v65.0/ssot/insight/calculated-insights/web_catalog_insight_realtime__cio`,
                     headers: {
                         Authorization: `Bearer ${accessToken}`,
                     },
@@ -115,7 +115,7 @@ class GuestController {
                                             item.productid__c === catalogId,
                                     );
                                     console.log('result:', result);
-                                    ReqDiscountProduct(deviceId, catalogId);
+                                    ReqDiscountProduct(deviceId, result);
                                 }
                             } catch (err) {
                                 console.error('Lỗi khi xử lý một event trong batch:', err);
