@@ -103,8 +103,8 @@ class GuestController {
                     if (webhookData.events && webhookData.events.length > 0) {
                         for (const eventItem of webhookData.events) {
                             try {
-                                console.log('1');
                                 const rawPayloadString = eventItem.PayloadCurrentValue;
+                                if (!rawPayloadString) continue;
                                 const parsedBody = JSON.parse(rawPayloadString);
                                 const deviceId = parsedBody['Website_Connection_Behavioral_E_2656__dlm_deviceId__c'];
                                 const catalogId = parsedBody['Website_Connection_Behavioral_E_2656__dlm_catalog_id__c'];
