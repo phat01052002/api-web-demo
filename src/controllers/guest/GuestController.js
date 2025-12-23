@@ -109,7 +109,7 @@ class GuestController {
                                 const deviceId = parsedBody['Website_Connection_Behavioral_E_2656__dlm_deviceId__c'];
                                 const catalogId = parsedBody['Website_Connection_Behavioral_E_2656__dlm_catalog_id__c'];
                                 if (deviceId && catalogId) {
-                                    const result = resInsight.data.find(
+                                    const result = resInsight.data.data.find(
                                         (item) =>
                                             item.data_graph_dimension__c === deviceId &&
                                             item.productid__c === catalogId,
