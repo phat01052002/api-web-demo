@@ -54,14 +54,13 @@ class GuestController {
         try {
             const webhookData = req.body;
 
-            // Kiểm tra xem có events nào không
             if (webhookData.events && webhookData.events.length > 0) {
                 console.log(`Nhận được batch gồm ${webhookData.events.length} sự kiện.`);
                 for (const eventItem of webhookData.events) {
                     try {
                         const rawPayloadString = eventItem.PayloadCurrentValue;
                         const parsedBody = JSON.parse(rawPayloadString);
-                        const deviceId = parsedBody['web_catalog_insight__cio_deviceid__c'];
+                        const deviceId = parsedBody['web_catalog_insight_realtime__cio_deviceId__c'];
                         if (deviceId) {
                             ReqDiscountProduct(deviceId, parsedBody);
                         }
@@ -80,7 +79,7 @@ class GuestController {
             let config = {
                 method: 'post',
                 maxBodyLength: Infinity,
-                url: `https://trailsignup-145183137f0ca1.lightning.force.com/services/oauth2/token?client_id=${process.env.SF_CLIENT}&client_secret=${process.env.SF_SECRET}&grant_type=client_credentials`,
+                url: `${process.env.SF_HOST}/services/oauth2/token?client_id=${process.env.SF_CLIENT}&client_secret=${process.env.SF_SECRET}&grant_type=client_credentials`,
                 headers: {
                     Cookie: 'BrowserId=5TxKi9yqEfC9IJFS4Nb0Ww; CookieConsentPolicy=0:1; LSKey-c$CookieConsentPolicy=0:1',
                 },
@@ -94,7 +93,7 @@ class GuestController {
                 let config2 = {
                     method: 'post',
                     maxBodyLength: Infinity,
-                    url: 'https://trailsignup-145183137f0ca1.my.salesforce.com/services/data/v65.0/ssot/calculated-insights/web_catalog_insight__cio/actions/run',
+                    url: `${process.env.SF_HOST}/services/data/v65.0/ssot/data-graphs/web_catalog_graph_realtime/actions/refresh`,
                     headers: {
                         Authorization: `Bearer ${accessToken}`,
                         Cookie: 'BrowserId=5jfBj9yqEfCwYzubw7ISIQ; CookieConsentPolicy=0:1; LSKey-c$CookieConsentPolicy=0:1',
@@ -103,7 +102,6 @@ class GuestController {
                 };
                 const reqInsight = await axios.request(config2);
                 if (reqInsight.data.success == true) {
-                    console.log('here');
                     return res.status(200).json({ message: 'Success' });
                 } else {
                     return res.status(500).json({ error: 'internal_error' });
@@ -119,7 +117,7 @@ class GuestController {
             let config = {
                 method: 'post',
                 maxBodyLength: Infinity,
-                url: `https://trailsignup-145183137f0ca1.lightning.force.com/services/oauth2/token?client_id=${process.env.SF_CLIENT}&client_secret=${process.env.SF_SECRET}&grant_type=client_credentials`,
+                url: `${process.env.SF_HOST}/services/oauth2/token?client_id=${process.env.SF_CLIENT}&client_secret=${process.env.SF_SECRET}&grant_type=client_credentials`,
                 headers: {
                     Cookie: 'BrowserId=5TxKi9yqEfC9IJFS4Nb0Ww; CookieConsentPolicy=0:1; LSKey-c$CookieConsentPolicy=0:1',
                 },
