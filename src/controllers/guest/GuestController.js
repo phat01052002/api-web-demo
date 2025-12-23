@@ -100,9 +100,11 @@ class GuestController {
                     },
                     data: data,
                 };
-                const reqInsight = await axios.request(config2);
-                if (reqInsight.status == 200) {
+                const resInsight = await axios.request(config2);
+                if (resInsight.data.data.length > 0) {
+                    console.log('here');
                     if (webhookData.events && webhookData.events.length > 0) {
+                        console.log('here2');
                         for (const eventItem of webhookData.events) {
                             try {
                                 const rawPayloadString = eventItem.PayloadCurrentValue;
@@ -110,11 +112,14 @@ class GuestController {
                                 const deviceId = parsedBody['Website_Connection_Behavioral_E_2656__dlm_deviceId__c'];
                                 const catalogId = parsedBody['Website_Connection_Behavioral_E_2656__dlm_catalog_id__c'];
                                 if (deviceId && catalogId) {
-                                    const result = reqInsight.data.find(
+                                    console.log('here3');
+
+                                    const result = resInsight.data.find(
                                         (item) =>
                                             item.data_graph_dimension__c === deviceId &&
                                             item.productid__c === catalogId,
                                     );
+                                    console.log('result:', result);
                                     ReqDiscountProduct(deviceId, result);
                                 }
                             } catch (err) {
