@@ -52,23 +52,23 @@ class GuestController {
     }
     async webhookInsight(req, res) {
         try {
-            const webhookData = req.body;
+            // const webhookData = req.body;
 
-            if (webhookData.events && webhookData.events.length > 0) {
-                console.log(`Nhận được batch gồm ${webhookData.events.length} sự kiện.`);
-                for (const eventItem of webhookData.events) {
-                    try {
-                        const rawPayloadString = eventItem.PayloadCurrentValue;
-                        const parsedBody = JSON.parse(rawPayloadString);
-                        const deviceId = parsedBody['web_catalog_insight_realtime__cio_data_graph_dimension__c'];
-                        if (deviceId) {
-                            ReqDiscountProduct(deviceId, parsedBody);
-                        }
-                    } catch (err) {
-                        console.error('Lỗi khi xử lý một event trong batch:', err);
-                    }
-                }
-            }
+            // if (webhookData.events && webhookData.events.length > 0) {
+            //     console.log(`Nhận được batch gồm ${webhookData.events.length} sự kiện.`);
+            //     for (const eventItem of webhookData.events) {
+            //         try {
+            //             const rawPayloadString = eventItem.PayloadCurrentValue;
+            //             const parsedBody = JSON.parse(rawPayloadString);
+            //             const deviceId = parsedBody['web_catalog_insight_realtime__cio_data_graph_dimension__c'];
+            //             if (deviceId) {
+            //                 ReqDiscountProduct(deviceId, parsedBody);
+            //             }
+            //         } catch (err) {
+            //             console.error('Lỗi khi xử lý một event trong batch:', err);
+            //         }
+            //     }
+            // }
             return res.status(200).json({ message: 'Success' });
         } catch (error) {
             return res.status(500).json({ error: 'internal_error' });
@@ -91,9 +91,9 @@ class GuestController {
                 let data = '';
 
                 let config2 = {
-                    method: 'post',
+                    method: 'get',
                     maxBodyLength: Infinity,
-                    url: `${process.env.SF_HOST}/services/data/v65.0/ssot/data-graphs/web_catalog_graph_realtime/actions/refresh`,
+                    url: `${process.env.SF_HOST}/services/data/v65.0/ssot/insight/calculated-insights/web_catalog_insight_realtime__cio`,
                     headers: {
                         Authorization: `Bearer ${accessToken}`,
                         Cookie: 'BrowserId=5jfBj9yqEfCwYzubw7ISIQ; CookieConsentPolicy=0:1; LSKey-c$CookieConsentPolicy=0:1',
@@ -102,6 +102,21 @@ class GuestController {
                 };
                 const reqInsight = await axios.request(config2);
                 if (reqInsight.data.success == true) {
+                    if (webhookData.events && webhookData.events.length > 0) {
+                        for (const eventItem of webhookData.events) {
+                            try {
+                                const rawPayloadString = eventItem.PayloadCurrentValue;
+                                const parsedBody = JSON.parse(rawPayloadString);
+                                const deviceId =
+                                    parsedBody['Website_Connection_Behavioral_E_2656__dlm_deviceId__c'];
+                                if (deviceId) {
+                                    ReqDiscountProduct(deviceId, parsedBody);
+                                }
+                            } catch (err) {
+                                console.error('Lỗi khi xử lý một event trong batch:', err);
+                            }
+                        }
+                    }
                     return res.status(200).json({ message: 'Success' });
                 } else {
                     return res.status(500).json({ error: 'internal_error' });
