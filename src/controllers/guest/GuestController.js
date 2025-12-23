@@ -88,44 +88,40 @@ class GuestController {
             if (req.data.access_token) {
                 const accessToken = req.data.access_token;
                 console.log(accessToken);
-                // let data = '';
-
-                // let config2 = {
-                //     method: 'get',
-                //     maxBodyLength: Infinity,
-                //     url: `${process.env.SF_HOST}/services/data/v65.0/ssot/insight/calculated-insights/web_catalog_insight_realtime__cio`,
-                //     headers: {
-                //         Authorization: `Bearer ${accessToken}`,
-                //     },
-                //     data: data,
-                // };
-                // const resInsight = await axios.request(config2);
-                // console.log(resInsight.data);
-                // if (resInsight.data.data.length > 0) {
-                if (webhookData.events && webhookData.events.length > 0) {
-                    for (const eventItem of webhookData.events) {
-                        try {
-                            console.log('here');
-                            const rawPayloadString = eventItem.PayloadCurrentValue;
-                            const parsedBody = JSON.parse(rawPayloadString);
-                            const deviceId = parsedBody['Website_Connection_Behavioral_E_2656__dlm_deviceId__c'];
-                            const catalogId = parsedBody['Website_Connection_Behavioral_E_2656__dlm_catalog_id__c'];
-                            if (deviceId && catalogId) {
-                                console.log('here1');
-
-                                // const result = resInsight.data.find(
-                                //     (item) =>
-                                //         item.data_graph_dimension__c === deviceId &&
-                                //         item.productid__c === catalogId,
-                                // );
-                                // console.log('result:', result);
-                                ReqDiscountProduct(deviceId, catalogId);
+                let config2 = {
+                    method: 'get',
+                    maxBodyLength: Infinity,
+                    url: `${process.env.SF_HOST}/services/data/v65.0/ssot/insight/calculated-insights/web_catalog_insight_realtime__cio`,
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                    },
+                };
+                const resInsight = await axios.request(config2);
+                console.log(resInsight.data);
+                if (resInsight.data.data.length > 0) {
+                    const webhookData = req.body;
+                    if (webhookData.events && webhookData.events.length > 0) {
+                        for (const eventItem of webhookData.events) {
+                            try {
+                                console.log('1');
+                                const rawPayloadString = eventItem.PayloadCurrentValue;
+                                const parsedBody = JSON.parse(rawPayloadString);
+                                const deviceId = parsedBody['Website_Connection_Behavioral_E_2656__dlm_deviceId__c'];
+                                const catalogId = parsedBody['Website_Connection_Behavioral_E_2656__dlm_catalog_id__c'];
+                                if (deviceId && catalogId) {
+                                    const result = resInsight.data.find(
+                                        (item) =>
+                                            item.data_graph_dimension__c === deviceId &&
+                                            item.productid__c === catalogId,
+                                    );
+                                    console.log('result:', result);
+                                    ReqDiscountProduct(deviceId, catalogId);
+                                }
+                            } catch (err) {
+                                console.error('Lỗi khi xử lý một event trong batch:', err);
                             }
-                        } catch (err) {
-                            console.error('Lỗi khi xử lý một event trong batch:', err);
                         }
                     }
-                    // }
                     return res.status(200).json({ message: 'Success' });
                 } else {
                     return res.status(500).json({ error: 'internal_error' });
@@ -133,6 +129,7 @@ class GuestController {
             }
             return res.status(500).json({ error: 'internal_error' });
         } catch (error) {
+            console.log(error.message);
             return res.status(500).json({ error: 'internal_error' });
         }
     }
