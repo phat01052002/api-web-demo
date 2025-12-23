@@ -7,7 +7,7 @@ export const ReqNotification = (userId) => {
 };
 
 export const ReqNotificationMany = (userIds) => {
-    userIds.forEach(userId => {
+    userIds.forEach((userId) => {
         if (clients[userId]) {
             clients[userId].emit('reqNotification', '');
         }
@@ -28,5 +28,10 @@ export const ReqMessageShopNew = (userId) => {
 export const ReqWalletNew = (userId) => {
     if (clients[userId]) {
         clients[userId].emit('reqWalletNew', '');
+    }
+};
+export const ReqDiscountProduct = (userId, payload) => {
+    if (clients[userId]) {
+        clients[userId].emit('reqDiscountProduct', payload);
     }
 };

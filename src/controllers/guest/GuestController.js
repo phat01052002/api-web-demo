@@ -13,6 +13,7 @@ import CategoryRepository from '../../repositories/CategoryRepository.js';
 import AnnouncementService from '../../services/AnnouncementService.js';
 import BannerService from '../../services/BannerService.js';
 import axios from 'axios';
+import { ReqDiscountProduct } from '../socket/EmitSocket.js';
 class GuestController {
     initRoutes(app) {
         app.post('/webhook/web-engagement', this.webhookWebEngagement);
@@ -50,6 +51,20 @@ class GuestController {
     }
     async webhookWebEngagement(req, res) {
         try {
+            const webhookData = req.body;
+            if (webhookData.events && webhookData.events.length > 0) {
+                const rawPayloadString = webhookData.events[0].PayloadCurrentValue;
+                const parsedBody = JSON.parse(rawPayloadString);           
+                const deviceId =
+                    parsedBody['Website_Connection_identity_26563A37__dlm_deviceId__c'] ||
+                    parsedBody['Website_Connection_Behavioral_E_2656__dlm_deviceId__c'];
+                if (deviceId) {
+                    console.log(`Nhận webhook cho DeviceID: ${deviceId}`);
+                    ReqDiscountProduct(deviceId, parsedBody);
+                } else {
+                    console.log('Không tìm thấy Device ID trong webhook payload');
+                }
+            }
             return res.status(200).json({ message: 'Success' });
         } catch (error) {
             return res.status(500).json({ error: 'internal_error' });
