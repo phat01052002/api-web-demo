@@ -60,7 +60,7 @@ class GuestController {
                     try {
                         const rawPayloadString = eventItem.PayloadCurrentValue;
                         const parsedBody = JSON.parse(rawPayloadString);
-                        const deviceId = parsedBody['web_catalog_insight_realtime__cio_data_graph_dimension'];
+                        const deviceId = parsedBody['web_catalog_insight_realtime__cio_data_graph_dimension__c'];
                         if (deviceId) {
                             ReqDiscountProduct(deviceId, parsedBody);
                         }
