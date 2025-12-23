@@ -98,8 +98,8 @@ class GuestController {
                     data: data,
                 };
                 const reqInsight = await axios.request(config2);
-                if (reqInsight.status == 200) {
-                    console.log("here")
+                if (reqInsight.data.success == true) {
+                    console.log('here');
                     return res.status(200).json({ message: 'Success' });
                 } else {
                     return res.status(500).json({ error: 'internal_error' });
