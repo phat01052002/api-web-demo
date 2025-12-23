@@ -53,17 +53,21 @@ class GuestController {
     async webhookInsight(req, res) {
         try {
             const webhookData = req.body;
+
+            // Kiểm tra xem có events nào không
             if (webhookData.events && webhookData.events.length > 0) {
-                const rawPayloadString = webhookData.events[0].PayloadCurrentValue;
-                const parsedBody = JSON.parse(rawPayloadString);
-                const deviceId =
-                    parsedBody['Website_Connection_identity_26563A37__dlm_deviceId__c'] ||
-                    parsedBody['Website_Connection_Behavioral_E_2656__dlm_deviceId__c'];
-                if (deviceId) {
-                    console.log(`Nhận webhook cho DeviceID: ${deviceId}`);
-                    ReqDiscountProduct(deviceId, parsedBody);
-                } else {
-                    console.log('Không tìm thấy Device ID trong webhook payload');
+                console.log(`Nhận được batch gồm ${webhookData.events.length} sự kiện.`);
+                for (const eventItem of webhookData.events) {
+                    try {
+                        const rawPayloadString = eventItem.PayloadCurrentValue;
+                        const parsedBody = JSON.parse(rawPayloadString);
+                        const deviceId = parsedBody['web_catalog_insight__cio_deviceid__c'];
+                        if (deviceId) {
+                            ReqDiscountProduct(deviceId, parsedBody);
+                        }
+                    } catch (err) {
+                        console.error('Lỗi khi xử lý một event trong batch:', err);
+                    }
                 }
             }
             return res.status(200).json({ message: 'Success' });
