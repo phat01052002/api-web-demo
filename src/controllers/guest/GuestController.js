@@ -101,16 +101,21 @@ class GuestController {
                     data: data,
                 };
                 const reqInsight = await axios.request(config2);
-                if (reqInsight.data.success == true) {
+                if (reqInsight.status == 200) {
                     if (webhookData.events && webhookData.events.length > 0) {
                         for (const eventItem of webhookData.events) {
                             try {
                                 const rawPayloadString = eventItem.PayloadCurrentValue;
                                 const parsedBody = JSON.parse(rawPayloadString);
-                                const deviceId =
-                                    parsedBody['Website_Connection_Behavioral_E_2656__dlm_deviceId__c'];
-                                if (deviceId) {
-                                    ReqDiscountProduct(deviceId, parsedBody);
+                                const deviceId = parsedBody['Website_Connection_Behavioral_E_2656__dlm_deviceId__c'];
+                                const catalogId = parsedBody['Website_Connection_Behavioral_E_2656__dlm_catalog_id__c'];
+                                if (deviceId && catalogId) {
+                                    const result = reqInsight.data.find(
+                                        (item) =>
+                                            item.data_graph_dimension__c === deviceId &&
+                                            item.productid__c === catalogId,
+                                    );
+                                    ReqDiscountProduct(deviceId, result);
                                 }
                             } catch (err) {
                                 console.error('Lỗi khi xử lý một event trong batch:', err);
