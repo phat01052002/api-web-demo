@@ -52,9 +52,11 @@ class GuestController {
     async webhookWebEngagement(req, res) {
         try {
             const webhookData = req.body;
+            console.log('here');
             if (webhookData.events && webhookData.events.length > 0) {
+                console.log('here1');
                 const rawPayloadString = webhookData.events[0].PayloadCurrentValue;
-                const parsedBody = JSON.parse(rawPayloadString);           
+                const parsedBody = JSON.parse(rawPayloadString);
                 const deviceId =
                     parsedBody['Website_Connection_identity_26563A37__dlm_deviceId__c'] ||
                     parsedBody['Website_Connection_Behavioral_E_2656__dlm_deviceId__c'];
