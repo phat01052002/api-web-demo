@@ -105,11 +105,14 @@ class GuestController {
                 if (webhookData.events && webhookData.events.length > 0) {
                     for (const eventItem of webhookData.events) {
                         try {
+                            console.log('here');
                             const rawPayloadString = eventItem.PayloadCurrentValue;
                             const parsedBody = JSON.parse(rawPayloadString);
                             const deviceId = parsedBody['Website_Connection_Behavioral_E_2656__dlm_deviceId__c'];
                             const catalogId = parsedBody['Website_Connection_Behavioral_E_2656__dlm_catalog_id__c'];
                             if (deviceId && catalogId) {
+                                console.log('here1');
+
                                 // const result = resInsight.data.find(
                                 //     (item) =>
                                 //         item.data_graph_dimension__c === deviceId &&
