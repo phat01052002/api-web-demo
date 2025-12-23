@@ -134,6 +134,7 @@ class GuestController {
             }
             return res.status(500).json({ error: 'internal_error' });
         } catch (error) {
+            console.error(error.message);
             return res.status(500).json({ error: 'internal_error' });
         }
     }
