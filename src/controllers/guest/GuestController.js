@@ -91,16 +91,16 @@ class GuestController {
                 let data = '';
 
                 let config2 = {
-                    method: 'get',
+                    method: 'GET',
                     maxBodyLength: Infinity,
                     url: `${process.env.SF_HOST}/services/data/v65.0/ssot/insight/calculated-insights/web_catalog_insight_realtime__cio`,
                     headers: {
                         Authorization: `Bearer ${accessToken}`,
-                        Cookie: 'BrowserId=5jfBj9yqEfCwYzubw7ISIQ; CookieConsentPolicy=0:1; LSKey-c$CookieConsentPolicy=0:1',
                     },
                     data: data,
                 };
                 const resInsight = await axios.request(config2);
+                console.log(resInsight.data);
                 if (resInsight.data.data.length > 0) {
                     console.log('here');
                     if (webhookData.events && webhookData.events.length > 0) {
