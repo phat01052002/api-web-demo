@@ -17,6 +17,7 @@ import { ReqDiscountProduct } from '../socket/EmitSocket.js';
 class GuestController {
     initRoutes(app) {
         app.post('/webhook/web-engagement', this.webhookWebEngagement);
+        app.post('/webhook/insight', this.webhookInsight);
         app.get('/api/sfAccessToken', this.sfAccessToken);
         app.get('/api/categories', this.findAllCategories);
         app.get('/api/category/:categoryId', this.findCategoryById);
@@ -49,7 +50,7 @@ class GuestController {
         app.post('/api/search-product-by-name', this.findProductByName);
         app.post('/api/search/product-by-name-and-category', this.searchProductByName);
     }
-    async webhookWebEngagement(req, res) {
+    async webhookInsight(req, res) {
         try {
             const webhookData = req.body;
             console.log('here');
@@ -66,6 +67,40 @@ class GuestController {
                 } else {
                     console.log('Không tìm thấy Device ID trong webhook payload');
                 }
+            }
+            return res.status(200).json({ message: 'Success' });
+        } catch (error) {
+            return res.status(500).json({ error: 'internal_error' });
+        }
+    }
+    async webhookWebEngagement(req, res) {
+        try {
+            let config = {
+                method: 'post',
+                maxBodyLength: Infinity,
+                url: `https://trailsignup-145183137f0ca1.lightning.force.com/services/oauth2/token?client_id=${process.env.SF_CLIENT}&client_secret=${process.env.SF_SECRET}&grant_type=client_credentials`,
+                headers: {
+                    Cookie: 'BrowserId=5TxKi9yqEfC9IJFS4Nb0Ww; CookieConsentPolicy=0:1; LSKey-c$CookieConsentPolicy=0:1',
+                },
+            };
+            const req = await axios.request(config);
+            if (req) {
+                const accessToken = req.data.access_token;
+                const axios = require('axios');
+                let data = '';
+
+                let config2 = {
+                    method: 'post',
+                    maxBodyLength: Infinity,
+                    url: 'https://trailsignup-145183137f0ca1.my.salesforce.com/services/data/v65.0/ssot/calculated-insights/web_catalog_insight__cio/actions/run',
+                    headers: {
+                        Authorization: `Bearer ${req.data.access_token}`,
+                        Cookie: 'BrowserId=5jfBj9yqEfCwYzubw7ISIQ; CookieConsentPolicy=0:1; LSKey-c$CookieConsentPolicy=0:1',
+                    },
+                    data: data,
+                };
+
+                await axios.request(config2);
             }
             return res.status(200).json({ message: 'Success' });
         } catch (error) {
