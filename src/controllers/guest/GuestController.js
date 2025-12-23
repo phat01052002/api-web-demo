@@ -86,6 +86,7 @@ class GuestController {
             const req = await axios.request(config);
             if (req) {
                 const accessToken = req.data.access_token;
+                console.log(accessToken)
                 const axios = require('axios');
                 let data = '';
 
@@ -99,7 +100,6 @@ class GuestController {
                     },
                     data: data,
                 };
-
                 await axios.request(config2);
             }
             return res.status(200).json({ message: 'Success' });
