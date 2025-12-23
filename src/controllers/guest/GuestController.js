@@ -84,9 +84,9 @@ class GuestController {
                     Cookie: 'BrowserId=5TxKi9yqEfC9IJFS4Nb0Ww; CookieConsentPolicy=0:1; LSKey-c$CookieConsentPolicy=0:1',
                 },
             };
-            const req = await axios.request(config);
-            if (req.data.access_token) {
-                const accessToken = req.data.access_token;
+            const resToken = await axios.request(config);
+            if (resToken.data.access_token) {
+                const accessToken = resToken.data.access_token;
                 console.log(accessToken);
                 let config2 = {
                     method: 'get',
