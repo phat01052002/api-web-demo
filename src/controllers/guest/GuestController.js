@@ -53,9 +53,7 @@ class GuestController {
     async webhookInsight(req, res) {
         try {
             const webhookData = req.body;
-            console.log('here');
             if (webhookData.events && webhookData.events.length > 0) {
-                console.log('here1');
                 const rawPayloadString = webhookData.events[0].PayloadCurrentValue;
                 const parsedBody = JSON.parse(rawPayloadString);
                 const deviceId =
@@ -102,6 +100,7 @@ class GuestController {
                 };
                 const reqInsight = await axios.request(config2);
                 if (reqInsight.status == 200) {
+                    console.log("here")
                     return res.status(200).json({ message: 'Success' });
                 } else {
                     return res.status(500).json({ error: 'internal_error' });
