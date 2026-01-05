@@ -174,7 +174,7 @@ class GuestController {
                                     item.type__c === 'Product',
                             );
                             if (rowCurrent) {
-                                if (rowCurrent.count__c > 3) {
+                                if (rowCurrent.count__c >= 1) {
                                     ReqDiscountProduct(req.body.deviceId, 'show-voucher');
                                 }
                             }
