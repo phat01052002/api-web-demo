@@ -96,15 +96,23 @@ class GuestController {
                                 item.type__c === 'Order',
                         );
                         if (isOrder) {
-                            const checkLastDatePurcharse = resBatchInsight.data.data.find((item) => {
-                                item.data_graph_dimension__c === req.body.deviceId &&
+                            const checkLastDatePurcharse = resBatchInsight.data.data.find(
+                                (item) =>
+                                    item.deviceId__c === req.body.deviceId &&
                                     item.productid__c === req.body.productId &&
-                                    item.type__c === 'Order';
-                            });
+                                    item.type__c === 'Order',
+                            );
                             if (checkLastDatePurcharse && checkLastDatePurcharse.lastActiveDate__c < new Date.now() - 7)
                                 ReqDiscountProduct(req.body.deviceId, 'show-voucher');
                             else {
-                                ReqDiscountProduct(req.body.deviceId, 'show-relate-product');
+                                const blacklistId = resStreamInsight
+                                    .filter((item) => item.type__c === 'Order')
+                                    .map((item) => item.productid__c + item.data_graph_dimension__c);
+                                const whitelistId = resStreamInsight.filter(
+                                    (item) => !blacklistId.has(item.productid__c + item.data_graph_dimension__c),
+                                );
+
+                                ReqDiscountProduct(req.body.deviceId, whitelistId[0]);
                             }
                         } else {
                             ReqDiscountProduct(req.body.deviceId, 'show-voucher');
