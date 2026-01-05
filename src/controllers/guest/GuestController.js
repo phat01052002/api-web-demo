@@ -14,11 +14,14 @@ import AnnouncementService from '../../services/AnnouncementService.js';
 import BannerService from '../../services/BannerService.js';
 import axios from 'axios';
 import { ReqDiscountProduct } from '../socket/EmitSocket.js';
+let globalProductCache = new Map();
+let listTopViewProductId = [];
 class GuestController {
     initRoutes(app) {
         app.post('/webhook/web-engagement', this.webhookWebEngagement);
-        app.post('/webhook/insight', this.webhookInsight);
+        app.post('/webhook/topViewProduct', this.webhookInsight);
         app.get('/api/sfAccessToken', this.sfAccessToken);
+        app.post('/api/list-products-hot', this.findProductsHot);
         app.get('/api/categories', this.findAllCategories);
         app.get('/api/category/:categoryId', this.findCategoryById);
         app.get('/api/products', this.findAllProducts);
@@ -52,23 +55,24 @@ class GuestController {
     }
     async webhookInsight(req, res) {
         try {
-            // const webhookData = req.body;
+            const webhookData = req.body;
 
-            // if (webhookData.events && webhookData.events.length > 0) {
-            //     console.log(`Nhận được batch gồm ${webhookData.events.length} sự kiện.`);
-            //     for (const eventItem of webhookData.events) {
-            //         try {
-            //             const rawPayloadString = eventItem.PayloadCurrentValue;
-            //             const parsedBody = JSON.parse(rawPayloadString);
-            //             const deviceId = parsedBody['web_catalog_insight_realtime__cio_data_graph_dimension__c'];
-            //             if (deviceId) {
-            //                 ReqDiscountProduct(deviceId, parsedBody);
-            //             }
-            //         } catch (err) {
-            //             console.error('Lỗi khi xử lý một event trong batch:', err);
-            //         }
-            //     }
-            // }
+            webhookData.forEach((event) => {
+                const payload = JSON.parse(event.PayloadCurrentValue);
+                const product = {
+                    id: payload.TopViewProduct__cio_productid__c,
+                    count: payload.TopViewProduct__cio_count__c,
+                    rank: payload.TopViewProduct__cio_rank_val__c,
+                };
+
+                globalProductCache.set(product.id, product);
+            });
+            const allProducts = Array.from(globalProductCache.values());
+            const currentTop4 = allProducts
+                .sort((a, b) => {
+                    return a.rank - b.rank;
+                })
+                .slice(0, 4);
             return res.status(200).json({ message: 'Success' });
         } catch (error) {
             return res.status(500).json({ error: 'internal_error' });
@@ -216,6 +220,20 @@ class GuestController {
             const category = await CategoryService.getCategory(categoryId);
             if (category) {
                 return res.status(httpStatus.OK).json({ message: 'Success', category });
+            } else {
+                return res.status(httpStatus.NOT_FOUND).json({ message: 'Not Found' });
+            }
+        } catch (e) {
+            console.log(e.message);
+            return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Fail' });
+        }
+    }
+    async findProductsHot(req, res) {
+        try {
+            req.body.listProductId = listProductHotId;
+            const products = await ProductService.getProducts(req);
+            if (products) {
+                return res.status(httpStatus.OK).json({ message: 'Success', products });
             } else {
                 return res.status(httpStatus.NOT_FOUND).json({ message: 'Not Found' });
             }
