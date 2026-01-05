@@ -144,11 +144,11 @@ class GuestController {
                                 console.log('isPass:', isPass);
                                 if (isPass) {
                                     GuestService.findProductRelated(req, resStreamInsight);
-                                    return res.status(200).json({ message: 'Success' });
                                 }
                             }
                         });
                     }
+                    console.log('abcxyz');
                     //after check insight
                     if (req.body.deviceId && req.body.productId) {
                         const isOrder = resStreamInsight.data.data.find(
