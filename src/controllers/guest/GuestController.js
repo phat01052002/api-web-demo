@@ -102,7 +102,7 @@ class GuestController {
                                     item.productid__c === req.body.productId &&
                                     item.type__c === 'Order',
                             );
-                            if (checkLastDatePurcharse && checkLastDatePurcharse.lastActiveDate__c < new Date.now() - 7)
+                            if (checkLastDatePurcharse && checkLastDatePurcharse.lastActiveDate__c < Date.now() - 7)
                                 ReqDiscountProduct(req.body.deviceId, 'show-voucher');
                             else {
                                 const blacklistId = resStreamInsight
