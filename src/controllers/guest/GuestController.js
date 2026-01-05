@@ -234,7 +234,7 @@ class GuestController {
     }
     async findProductsHot(req, res) {
         try {
-            req.body.listProductId = listProductHotId.find((item) => item.id);
+            req.body.listProductId = listProductHotId.map((item) => item.id);
             console.log('req.body...', req.body.listProductId);
 
             const products = await ProductService.getProducts(req);
