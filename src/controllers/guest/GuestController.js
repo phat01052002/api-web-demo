@@ -154,9 +154,10 @@ class GuestController {
                                     }
                                 });
                                 console.log(results);
-                                const isPass = results.find((item) => {
-                                    item.deviceId == req.body.deviceId && item.productId == req.body.productId;
-                                });
+                                const isPass = results.find(
+                                    (item) =>
+                                        item.deviceId == req.body.deviceId && item.productId == req.body.productId,
+                                );
                                 console.log('isPass:', isPass);
                                 if (isPass) {
                                     this.findProductRelated(req, resStreamInsight);
