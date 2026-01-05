@@ -18,7 +18,6 @@ export const apiLogger = (req, res, next) => {
             status: res.statusCode,
             duration: duration + 'ms'
         };
-
         fs.appendFile(logFilePath, JSON.stringify(logEntry) + '\n', (err) => {
             if(err) console.error('Failed to write API log', err);
         });
@@ -26,3 +25,4 @@ export const apiLogger = (req, res, next) => {
 
     next();
 };
+

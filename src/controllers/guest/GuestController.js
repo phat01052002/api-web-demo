@@ -14,13 +14,18 @@ import AnnouncementService from '../../services/AnnouncementService.js';
 import BannerService from '../../services/BannerService.js';
 import axios from 'axios';
 import { ReqDiscountProduct } from '../socket/EmitSocket.js';
+import fs from 'fs';
+import path from 'path';
 let globalProductCache = new Map();
 let listProductHotId = [];
 class GuestController {
     initRoutes(app) {
+        app.post('/api/write-log-order', this.writeLogOrder);
         app.post('/api/check-web-engagement', this.checkWebEngagement);
         app.get('/api/sfAccessToken', this.sfAccessToken);
         app.post('/api/list-products-hot', this.findProductsHot);
+        app.post('/api/check-web-engagement', this.checkWebEngagement);
+
         app.get('/api/categories', this.findAllCategories);
         app.get('/api/category/:categoryId', this.findCategoryById);
         app.get('/api/products', this.findAllProducts);
@@ -52,9 +57,61 @@ class GuestController {
         app.post('/api/search-product-by-name', this.findProductByName);
         app.post('/api/search/product-by-name-and-category', this.searchProductByName);
     }
+    async writeLogOrder(req, res) {
+        try {
+            const time = new Date().toISOString();
+            const logLine = `[${time}] - Device: ${req.body.deviceId} - Product: ${req.body.productId}\n`;
 
+            const filePath = path.join(process.cwd(), 'logs', 'logOrder.log');
+            fs.mkdirSync(path.dirname(filePath), { recursive: true });
+
+            fs.appendFile(filePath, logLine, (err) => {
+                if (err) {
+                    console.error('Lỗi ghi file log:', err);
+                } else {
+                }
+            });
+            return res.status(200).json({ message: 'success' });
+        } catch {
+            return res.status(500).json({ error: 'internal_error' });
+        }
+    }
     async checkWebEngagement(req, res) {
         try {
+            //check log first
+            const LOG_FILE = path.join(process.cwd(), 'logs', 'logOrder.log');
+            if (!fs.existsSync(LOG_FILE)) {
+                console.log('File log chưa tồn tại.');
+                return resolve([]);
+            }
+            fs.readFile(LOG_FILE, 'utf8', (err, data) => {
+                if (err) return reject(err);
+                if (!data) return resolve([]);
+                const lines = data.split('\n');
+                const results = [];
+                lines.forEach((line) => {
+                    if (!line.trim()) return;
+
+                    const regex = /Device:\s*(.+?)\s*-\s*Product:\s*(.+)/;
+                    const match = line.match(regex);
+                    if (match) {
+                        const deviceId = match[1].trim();
+                        const productId = match[2].trim();
+                        results.push({
+                            deviceId,
+                            productId,
+                        });
+                    }
+                });
+                resolve(results);
+            });
+            const isPass = results.find((item) => {
+                item.deviceId == req.body.deviceId && item.productId == req.body.deviceId;
+            });
+            if (isPass) {
+                return res.status(200).json({ message: 'Success' });
+            }
+            //
             let config = {
                 method: 'post',
                 maxBodyLength: Infinity,
@@ -114,7 +171,6 @@ class GuestController {
                                         )
                                         .map((item) => item.productid__c + item.data_graph_dimension__c),
                                 );
-                                console.log(blacklistId);
                                 const whitelist = resStreamInsight.data.data
                                     .filter(
                                         (item) =>

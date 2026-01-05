@@ -118,6 +118,48 @@ cron.schedule('0 0 * * *', () => {
     cleanOldLogs();
     cleanOldImg_Video();
 });
+const LOG_DIR = path.join(process.cwd(), 'logs');
+const LOG_FILE = path.join(LOG_DIR, 'logOrder.log');
+const MAX_AGE_MS = 30 * 60 * 1000;
+if (!fs.existsSync(LOG_DIR)) {
+    fs.mkdirSync(LOG_DIR, { recursive: true });
+}
+function cleanOldLogs2() {
+    if (!fs.existsSync(LOG_FILE)) return;
+
+    fs.readFile(LOG_FILE, 'utf8', (err, data) => {
+        if (err) return console.error('Lỗi đọc log:', err);
+        if (!data) return;
+        const lines = data.split('\n');
+        const now = Date.now();
+        const newLines = [];
+        lines.forEach((line) => {
+            if (!line.trim()) return;
+            try {
+                const endBracketIndex = line.indexOf(']');
+                if (endBracketIndex > 1) {
+                    const timeString = line.substring(1, endBracketIndex);
+                    const logTime = new Date(timeString).getTime();
+                    if (now - logTime < MAX_AGE_MS) {
+                        newLines.push(line);
+                    }
+                }
+            } catch (e) {
+                newLines.push(line);
+            }
+        });
+        if (newLines.length < lines.length - 1) {
+            const contentToWrite = newLines.join('\n') + '\n';
+            fs.writeFile(LOG_FILE, contentToWrite, (wErr) => {
+                if (wErr) console.error('Lỗi ghi log:', wErr);
+                else console.log(`✅ [CRON] Đã xóa ${lines.length - 1 - newLines.length} dòng cũ.`);
+            });
+        }
+    });
+}
+cron.schedule('*/15 * * * *', () => {
+    cleanOldLogs2();
+});
 //--------------------------------------------------------------------
 initApplication(app);
 app.listen(port, () => {
