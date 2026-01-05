@@ -15,7 +15,7 @@ import BannerService from '../../services/BannerService.js';
 import axios from 'axios';
 import { ReqDiscountProduct } from '../socket/EmitSocket.js';
 let globalProductCache = new Map();
-let listTopViewProductId = [];
+let listProductHotId = [];
 class GuestController {
     initRoutes(app) {
         app.post('/webhook/web-engagement', this.webhookWebEngagement);
