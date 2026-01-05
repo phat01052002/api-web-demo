@@ -123,7 +123,7 @@ class GuestController {
                             if (err) return res.status(500).json({ error: 'internal_error' });
                             if (data) {
                                 const lines = data.split('\n');
-                                for (i = 0; i < lines.length; i++) {
+                                for (var i = 0; i < lines.length; i++) {
                                     if (!lines[i].trim()) return;
 
                                     const regex = /Device:\s*(.+?)\s*-\s*Product:\s*(.+)/;
