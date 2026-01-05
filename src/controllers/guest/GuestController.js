@@ -80,36 +80,34 @@ class GuestController {
         try {
             //check log first
             const LOG_FILE = path.join(process.cwd(), 'logs', 'logOrder.log');
-            if (!fs.existsSync(LOG_FILE)) {
-                console.log('File log chưa tồn tại.');
-                return resolve([]);
-            }
-            fs.readFile(LOG_FILE, 'utf8', (err, data) => {
-                if (err) return reject(err);
-                if (!data) return resolve([]);
-                const lines = data.split('\n');
-                const results = [];
-                lines.forEach((line) => {
-                    if (!line.trim()) return;
+            if (fs.existsSync(LOG_FILE)) {
+                fs.readFile(LOG_FILE, 'utf8', (err, data) => {
+                    if (err) return res.status(500).json({ error: 'internal_error' });
+                    if (data) {
+                        const lines = data.split('\n');
+                        const results = [];
+                        lines.forEach((line) => {
+                            if (!line.trim()) return;
 
-                    const regex = /Device:\s*(.+?)\s*-\s*Product:\s*(.+)/;
-                    const match = line.match(regex);
-                    if (match) {
-                        const deviceId = match[1].trim();
-                        const productId = match[2].trim();
-                        results.push({
-                            deviceId,
-                            productId,
+                            const regex = /Device:\s*(.+?)\s*-\s*Product:\s*(.+)/;
+                            const match = line.match(regex);
+                            if (match) {
+                                const deviceId = match[1].trim();
+                                const productId = match[2].trim();
+                                results.push({
+                                    deviceId,
+                                    productId,
+                                });
+                            }
                         });
+                        const isPass = results.find((item) => {
+                            item.deviceId == req.body.deviceId && item.productId == req.body.deviceId;
+                        });
+                        if (isPass) {
+                            return res.status(200).json({ message: 'Success' });
+                        }
                     }
                 });
-                resolve(results);
-            });
-            const isPass = results.find((item) => {
-                item.deviceId == req.body.deviceId && item.productId == req.body.deviceId;
-            });
-            if (isPass) {
-                return res.status(200).json({ message: 'Success' });
             }
             //
             let config = {
