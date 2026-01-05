@@ -123,11 +123,11 @@ class GuestController {
                             if (err) return res.status(500).json({ error: 'internal_error' });
                             if (data) {
                                 const lines = data.split('\n');
-                                lines.forEach((line) => {
-                                    if (!line.trim()) return;
+                                for (i = 0; i < lines.length; i++) {
+                                    if (!lines[i].trim()) return;
 
                                     const regex = /Device:\s*(.+?)\s*-\s*Product:\s*(.+)/;
-                                    const match = line.match(regex);
+                                    const match = lines[i].match(regex);
                                     if (match) {
                                         const deviceId = match[1].trim();
                                         const productId = match[2].trim();
@@ -136,7 +136,7 @@ class GuestController {
                                             productId,
                                         });
                                     }
-                                });
+                                }
                             }
                         });
                     }
