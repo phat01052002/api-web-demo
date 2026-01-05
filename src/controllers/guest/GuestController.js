@@ -73,6 +73,7 @@ class GuestController {
                     return a.rank - b.rank;
                 })
                 .slice(0, 4);
+
             return res.status(200).json({ message: 'Success' });
         } catch (error) {
             return res.status(500).json({ error: 'internal_error' });
@@ -230,10 +231,10 @@ class GuestController {
     }
     async findProductsHot(req, res) {
         try {
-            req.body.listProductId = listProductHotId;
+            req.body.listProductId = listProductHotId.find((item) => item.id);
             const products = await ProductService.getProducts(req);
             if (products) {
-                return res.status(httpStatus.OK).json({ message: 'Success', products });
+                return res.status(httpStatus.OK).json({ message: 'Success', products, listProductHotId });
             } else {
                 return res.status(httpStatus.NOT_FOUND).json({ message: 'Not Found' });
             }
