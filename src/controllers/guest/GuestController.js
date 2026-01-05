@@ -115,15 +115,18 @@ class GuestController {
                                         .map((item) => item.productid__c + item.data_graph_dimension__c),
                                 );
                                 console.log(blacklistId);
-                                const whitelistId = resStreamInsight.data.data.filter(
-                                    (item) =>
-                                        !blacklistId.has(item.productid__c + item.data_graph_dimension__c) &&
-                                        item.deviceId__c === req.body.deviceId &&
-                                        item.productid__c !== req.body.productId &&
-                                        item.type__c === 'Product',
-                                );
+                                const whitelist = resStreamInsight.data.data
+                                    .filter(
+                                        (item) =>
+                                            !blacklistId.has(item.productid__c + item.data_graph_dimension__c) &&
+                                            item.data_graph_dimension__c === req.body.deviceId &&
+                                            item.productid__c !== req.body.productId &&
+                                            item.type__c === 'Product',
+                                    )
+                                    .sort((a, b) => b.count__c - a.count__c)
+                                    .slice(0, 1);
 
-                                ReqDiscountProduct(req.body.deviceId, whitelistId);
+                                ReqDiscountProduct(req.body.deviceId, whitelist);
                             }
                         } else {
                             ReqDiscountProduct(req.body.deviceId, 'show-voucher');
