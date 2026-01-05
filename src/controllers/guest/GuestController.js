@@ -88,6 +88,7 @@ class GuestController {
                 const resBatchInsight = await axios.request(config3);
 
                 if (resStreamInsight.data.data.length > 0 && resBatchInsight.data.data.length > 0) {
+                    console.log('here');
                     if (req.body.deviceId && req.body.productId) {
                         const isOrder = resStreamInsight.data.data.find(
                             (item) =>
@@ -95,6 +96,7 @@ class GuestController {
                                 item.productid__c === req.body.productId &&
                                 item.type__c === 'Order',
                         );
+                        console.log('isOrder:', isOrder);
                         if (isOrder.length > 0) {
                             const checkLastDatePurcharse = resBatchInsight.data.data.find((item) => {
                                 item.data_graph_dimension__c === req.body.deviceId &&
