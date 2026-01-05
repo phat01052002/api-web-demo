@@ -105,11 +105,13 @@ class GuestController {
                             if (checkLastDatePurcharse && checkLastDatePurcharse.lastActiveDate__c < Date.now() - 7)
                                 ReqDiscountProduct(req.body.deviceId, 'show-voucher');
                             else {
-                                const blacklistId = resBatchInsight.data.data
-                                    .filter((item) => item.type__c === 'Order')
-                                    .map((item) => item.productid__c + item.data_graph_dimension__c);
+                                const blacklistId = new Set(
+                                    resBatchInsight.data.data
+                                        .filter((item) => item.type__c === 'Order')
+                                        .map((item) => item.productid__c + item.deviceId__c),
+                                );
                                 const whitelistId = resBatchInsight.data.data.filter(
-                                    (item) => !blacklistId.has(item.productid__c + item.data_graph_dimension__c),
+                                    (item) => !blacklistId.has(item.productid__c + item.deviceId__c),
                                 );
 
                                 ReqDiscountProduct(req.body.deviceId, whitelistId[0]);
