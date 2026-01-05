@@ -100,9 +100,11 @@ class GuestController {
                                 });
                             }
                         });
+                        console.log(results);
                         const isPass = results.find((item) => {
                             item.deviceId == req.body.deviceId && item.productId == req.body.deviceId;
                         });
+                        console.log('isPass:', isPass);
                         if (isPass) {
                             return res.status(200).json({ message: 'Success' });
                         }
