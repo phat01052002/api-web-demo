@@ -57,7 +57,7 @@ class GuestController {
         try {
             const webhookData = req.body;
             console.log(webhookData);
-            webhookData.forEach((event) => {
+            webhookData.events.forEach((event) => {
                 const payload = JSON.parse(event.PayloadCurrentValue);
                 const product = {
                     id: payload.TopViewProduct__cio_productid__c,
