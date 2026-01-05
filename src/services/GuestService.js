@@ -3,7 +3,8 @@ import ProductRepository from '../repositories/ProductRepository.js';
 import removeAccents from 'remove-accents';
 import fs from 'fs/promises';
 import path from 'path';
-import DiscountRepository from '../repositories/DiscountRepository.js';
+import { ReqDiscountProduct } from '../controllers/socket/EmitSocket.js';
+// import DiscountRepository from '../repositories/DiscountRepository.js';
 class GuestService {
     productDAO = (product) => {
         return {
