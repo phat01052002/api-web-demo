@@ -115,13 +115,14 @@ class GuestController {
 
                 if (resStreamInsight.data.data.length > 0 && resBatchInsight.data.data.length > 0) {
                     //check log first
+                    const results = [];
+
                     const LOG_FILE = path.join(process.cwd(), 'logs', 'logOrder.log');
                     if (fs.existsSync(LOG_FILE)) {
-                        fs.readFileSync(LOG_FILE, 'utf8', (err, data) => {
+                        fs.readFile(LOG_FILE, 'utf8', (err, data) => {
                             if (err) return res.status(500).json({ error: 'internal_error' });
                             if (data) {
                                 const lines = data.split('\n');
-                                const results = [];
                                 lines.forEach((line) => {
                                     if (!line.trim()) return;
 
@@ -136,18 +137,17 @@ class GuestController {
                                         });
                                     }
                                 });
-                                console.log(results);
-                                const isPass = results.find(
-                                    (item) =>
-                                        item.deviceId == req.body.deviceId && item.productId == req.body.productId,
-                                );
-                                console.log('isPass:', isPass);
-                                if (isPass) {
-                                    GuestService.findProductRelated(req, resStreamInsight);
-                                    return res.status(200).json({ message: 'Success' });
-                                }
                             }
                         });
+                    }
+                    console.log(results);
+                    const isPass = results.find(
+                        (item) => item.deviceId == req.body.deviceId && item.productId == req.body.productId,
+                    );
+                    console.log('isPass:', isPass);
+                    if (isPass) {
+                        GuestService.findProductRelated(req, resStreamInsight);
+                        return res.status(200).json({ message: 'Success' });
                     }
                     console.log('abcxyz');
                     //after check insight
