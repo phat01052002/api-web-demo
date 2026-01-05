@@ -68,7 +68,7 @@ class GuestController {
                 globalProductCache.set(product.id, product);
             });
             const allProducts = Array.from(globalProductCache.values());
-            const currentTop4 = allProducts
+            listProductHotId = allProducts
                 .sort((a, b) => {
                     return a.rank - b.rank;
                 })
