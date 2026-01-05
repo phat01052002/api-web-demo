@@ -116,7 +116,7 @@ class GuestController {
                                         item.deviceId__c == req.body.deviceId,
                                 );
 
-                                ReqDiscountProduct(req.body.deviceId, whitelistId[0]);
+                                ReqDiscountProduct(req.body.deviceId, whitelistId);
                             }
                         } else {
                             ReqDiscountProduct(req.body.deviceId, 'show-voucher');
