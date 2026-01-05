@@ -117,7 +117,7 @@ class GuestController {
                     //check log first
                     const LOG_FILE = path.join(process.cwd(), 'logs', 'logOrder.log');
                     if (fs.existsSync(LOG_FILE)) {
-                        fs.readFile(LOG_FILE, 'utf8', (err, data) => {
+                        fs.readFileSync(LOG_FILE, 'utf8', (err, data) => {
                             if (err) return res.status(500).json({ error: 'internal_error' });
                             if (data) {
                                 const lines = data.split('\n');
@@ -144,6 +144,7 @@ class GuestController {
                                 console.log('isPass:', isPass);
                                 if (isPass) {
                                     GuestService.findProductRelated(req, resStreamInsight);
+                                    return res.status(200).json({ message: 'Success' });
                                 }
                             }
                         });
