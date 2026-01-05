@@ -111,7 +111,9 @@ class GuestController {
                                         .map((item) => item.productid__c + item.deviceId__c),
                                 );
                                 const whitelistId = resBatchInsight.data.data.filter(
-                                    (item) => !blacklistId.has(item.productid__c + item.deviceId__c),
+                                    (item) =>
+                                        !blacklistId.has(item.productid__c + item.deviceId__c) &&
+                                        item.deviceId__c == req.body.deviceId,
                                 );
 
                                 ReqDiscountProduct(req.body.deviceId, whitelistId[0]);
