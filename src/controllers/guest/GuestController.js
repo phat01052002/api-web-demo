@@ -114,12 +114,13 @@ class GuestController {
                                         )
                                         .map((item) => item.productid__c + item.deviceId__c),
                                 );
+                                console.log(blacklistId);
                                 const whitelistId = resStreamInsight.data.data.filter(
                                     (item) =>
                                         !blacklistId.has(item.productid__c + item.deviceId__c) &&
                                         item.deviceId__c === req.body.deviceId &&
                                         item.productid__c !== req.body.productId &&
-                                        item.type__c == 'Product',
+                                        item.type__c === 'Product',
                                 );
 
                                 ReqDiscountProduct(req.body.deviceId, whitelistId);
