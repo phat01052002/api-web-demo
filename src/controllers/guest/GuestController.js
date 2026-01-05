@@ -112,12 +112,12 @@ class GuestController {
                                                 item.type__c === 'Order' &&
                                                 item.data_graph_dimension__c == req.body.deviceId,
                                         )
-                                        .map((item) => item.productid__c + item.deviceId__c),
+                                        .map((item) => item.productid__c + item.data_graph_dimension__c),
                                 );
                                 console.log(blacklistId);
                                 const whitelistId = resStreamInsight.data.data.filter(
                                     (item) =>
-                                        !blacklistId.has(item.productid__c + item.deviceId__c) &&
+                                        !blacklistId.has(item.productid__c + item.data_graph_dimension__c) &&
                                         item.deviceId__c === req.body.deviceId &&
                                         item.productid__c !== req.body.productId &&
                                         item.type__c === 'Product',
