@@ -167,7 +167,17 @@ class GuestController {
                                 GuestService.findProductRelated(req, resStreamInsight);
                             }
                         } else {
-                            ReqDiscountProduct(req.body.deviceId, 'show-voucher');
+                            const rowCurrent = resStreamInsight.data.data.find(
+                                (item) =>
+                                    item.data_graph_dimension__c === req.body.deviceId &&
+                                    item.productid__c === req.body.productId &&
+                                    item.type__c === 'Product',
+                            );
+                            if (rowCurrent) {
+                                if (rowCurrent.count__c > 3) {
+                                    ReqDiscountProduct(req.body.deviceId, 'show-voucher');
+                                }
+                            }
                         }
                     }
                     return res.status(200).json({ message: 'Success' });
