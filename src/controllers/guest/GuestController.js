@@ -76,41 +76,27 @@ class GuestController {
             return res.status(500).json({ error: 'internal_error' });
         }
     }
+    findProductRelated = (req, resStreamInsight) => {
+        const blacklistId = new Set(
+            resStreamInsight.data.data
+                .filter((item) => item.type__c === 'Order' && item.data_graph_dimension__c == req.body.deviceId)
+                .map((item) => item.productid__c + item.data_graph_dimension__c),
+        );
+        const whitelist = resStreamInsight.data.data
+            .filter(
+                (item) =>
+                    !blacklistId.has(item.productid__c + item.data_graph_dimension__c) &&
+                    item.data_graph_dimension__c === req.body.deviceId &&
+                    item.productid__c !== req.body.productId &&
+                    item.type__c === 'Product',
+            )
+            .sort((a, b) => b.count__c - a.count__c)
+            .slice(0, 1);
+
+        ReqDiscountProduct(req.body.deviceId, whitelist);
+    };
     async checkWebEngagement(req, res) {
         try {
-            //check log first
-            const LOG_FILE = path.join(process.cwd(), 'logs', 'logOrder.log');
-            if (fs.existsSync(LOG_FILE)) {
-                fs.readFile(LOG_FILE, 'utf8', (err, data) => {
-                    if (err) return res.status(500).json({ error: 'internal_error' });
-                    if (data) {
-                        const lines = data.split('\n');
-                        const results = [];
-                        lines.forEach((line) => {
-                            if (!line.trim()) return;
-
-                            const regex = /Device:\s*(.+?)\s*-\s*Product:\s*(.+)/;
-                            const match = line.match(regex);
-                            if (match) {
-                                const deviceId = match[1].trim();
-                                const productId = match[2].trim();
-                                results.push({
-                                    deviceId,
-                                    productId,
-                                });
-                            }
-                        });
-                        console.log(results);
-                        const isPass = results.find((item) => {
-                            item.deviceId == req.body.deviceId && item.productId == req.body.deviceId;
-                        });
-                        console.log('isPass:', isPass);
-                        if (isPass) {
-                            return res.status(200).json({ message: 'Success' });
-                        }
-                    }
-                });
-            }
             //
             let config = {
                 method: 'post',
@@ -145,6 +131,41 @@ class GuestController {
                 const resBatchInsight = await axios.request(config3);
 
                 if (resStreamInsight.data.data.length > 0 && resBatchInsight.data.data.length > 0) {
+                    //check log first
+                    const LOG_FILE = path.join(process.cwd(), 'logs', 'logOrder.log');
+                    if (fs.existsSync(LOG_FILE)) {
+                        fs.readFile(LOG_FILE, 'utf8', (err, data) => {
+                            if (err) return res.status(500).json({ error: 'internal_error' });
+                            if (data) {
+                                const lines = data.split('\n');
+                                const results = [];
+                                lines.forEach((line) => {
+                                    if (!line.trim()) return;
+
+                                    const regex = /Device:\s*(.+?)\s*-\s*Product:\s*(.+)/;
+                                    const match = line.match(regex);
+                                    if (match) {
+                                        const deviceId = match[1].trim();
+                                        const productId = match[2].trim();
+                                        results.push({
+                                            deviceId,
+                                            productId,
+                                        });
+                                    }
+                                });
+                                console.log(results);
+                                const isPass = results.find((item) => {
+                                    item.deviceId == req.body.deviceId && item.productId == req.body.productId;
+                                });
+                                console.log('isPass:', isPass);
+                                if (isPass) {
+                                    this.findProductRelated(req, resStreamInsight);
+                                    return res.status(200).json({ message: 'Success' });
+                                }
+                            }
+                        });
+                    }
+                    //after check insight
                     if (req.body.deviceId && req.body.productId) {
                         const isOrder = resStreamInsight.data.data.find(
                             (item) =>
@@ -162,27 +183,7 @@ class GuestController {
                             if (checkLastDatePurcharse && checkLastDatePurcharse.lastActiveDate__c < Date.now() - 7)
                                 ReqDiscountProduct(req.body.deviceId, 'show-voucher');
                             else {
-                                const blacklistId = new Set(
-                                    resStreamInsight.data.data
-                                        .filter(
-                                            (item) =>
-                                                item.type__c === 'Order' &&
-                                                item.data_graph_dimension__c == req.body.deviceId,
-                                        )
-                                        .map((item) => item.productid__c + item.data_graph_dimension__c),
-                                );
-                                const whitelist = resStreamInsight.data.data
-                                    .filter(
-                                        (item) =>
-                                            !blacklistId.has(item.productid__c + item.data_graph_dimension__c) &&
-                                            item.data_graph_dimension__c === req.body.deviceId &&
-                                            item.productid__c !== req.body.productId &&
-                                            item.type__c === 'Product',
-                                    )
-                                    .sort((a, b) => b.count__c - a.count__c)
-                                    .slice(0, 1);
-
-                                ReqDiscountProduct(req.body.deviceId, whitelist);
+                                this.findProductRelated(req, resStreamInsight);
                             }
                         } else {
                             ReqDiscountProduct(req.body.deviceId, 'show-voucher');
