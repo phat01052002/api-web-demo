@@ -18,8 +18,7 @@ let globalProductCache = new Map();
 let listProductHotId = [];
 class GuestController {
     initRoutes(app) {
-        app.post('/webhook/web-engagement', this.webhookWebEngagement);
-        app.post('/webhook/topViewProduct', this.webhookInsight);
+        app.post('/api/check-web-engagement', this.checkWebEngagement);
         app.get('/api/sfAccessToken', this.sfAccessToken);
         app.post('/api/list-products-hot', this.findProductsHot);
         app.get('/api/categories', this.findAllCategories);
@@ -53,36 +52,8 @@ class GuestController {
         app.post('/api/search-product-by-name', this.findProductByName);
         app.post('/api/search/product-by-name-and-category', this.searchProductByName);
     }
-    async webhookInsight(req, res) {
-        try {
-            const webhookData = req.body;
-            console.log(webhookData);
-            webhookData.events.forEach((event) => {
-                const payload = JSON.parse(event.PayloadCurrentValue);
-                const product = {
-                    id: payload.TopViewProduct__cio_productid__c,
-                    count: payload.TopViewProduct__cio_count__c,
-                    rank: payload.TopViewProduct__cio_rank_val__c,
-                };
 
-                globalProductCache.set(product.id, product);
-            });
-            const allProducts = Array.from(globalProductCache.values());
-            console.log('--------------------------------------------------------------------');
-            console.log(allProducts);
-            listProductHotId = allProducts
-                .sort((a, b) => {
-                    return a.rank - b.rank;
-                })
-                .slice(0, 4);
-            console.log('--------------------------------------------------------------------');
-            console.log(listProductHotId);
-            return res.status(200).json({ message: 'Success' });
-        } catch (error) {
-            return res.status(500).json({ error: 'internal_error' });
-        }
-    }
-    async webhookWebEngagement(req, res) {
+    async checkWebEngagement(req, res) {
         try {
             let config = {
                 method: 'post',
@@ -95,6 +66,7 @@ class GuestController {
             const resToken = await axios.request(config);
             if (resToken.data.access_token) {
                 const accessToken = resToken.data.access_token;
+                // streaming insight
                 let config2 = {
                     method: 'get',
                     maxBodyLength: Infinity,
@@ -103,31 +75,39 @@ class GuestController {
                         Authorization: `Bearer ${accessToken}`,
                     },
                 };
-                const resInsight = await axios.request(config2);
-                console.log(resInsight.data);
-                if (resInsight.data.data.length > 0) {
-                    /// webhook data
-                    const webhookData = req.body;
-                    if (webhookData.events && webhookData.events.length > 0) {
-                        for (const eventItem of webhookData.events) {
-                            try {
-                                const rawPayloadString = eventItem.PayloadCurrentValue;
-                                if (!rawPayloadString) continue;
-                                const parsedBody = JSON.parse(rawPayloadString);
-                                const deviceId = parsedBody['Website_Connection_Behavioral_E_2656__dlm_deviceId__c'];
-                                const catalogId = parsedBody['Website_Connection_Behavioral_E_2656__dlm_catalog_id__c'];
-                                // create payload
-                                if (deviceId && catalogId) {
-                                    const result = resInsight.data.data.find(
-                                        (item) =>
-                                            item.data_graph_dimension__c === deviceId &&
-                                            item.productid__c === catalogId,
-                                    );
-                                    ReqDiscountProduct(deviceId, result);
-                                }
-                            } catch (err) {
-                                console.error('Lỗi khi xử lý một event trong batch:', err);
+                const resStreamInsight = await axios.request(config2);
+                //batch insight
+                let config3 = {
+                    method: 'get',
+                    maxBodyLength: Infinity,
+                    url: `https://trailsignup-145183137f0ca1.my.salesforce.com/services/data/v65.0/ssot/insight/calculated-insights/web_catalog_insight_batch__cio`,
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                    },
+                };
+                const resBatchInsight = await axios.request(config3);
+
+                if (resStreamInsight.data.data.length > 0 && resBatchInsight.data.data.length > 0) {
+                    if (req.body.deviceId && req.body.productId) {
+                        const isOrder = resStreamInsight.data.data.find(
+                            (item) =>
+                                item.data_graph_dimension__c === req.body.deviceId &&
+                                item.productid__c === req.body.productId &&
+                                item.type__c === 'Order',
+                        );
+                        if (isOrder.length > 0) {
+                            const checkLastDatePurcharse = resBatchInsight.data.data.find((item) => {
+                                item.data_graph_dimension__c === req.body.deviceId &&
+                                    item.productid__c === req.body.productId &&
+                                    item.type__c === 'Order';
+                            });
+                            if (checkLastDatePurcharse.lastActiveDate__c < new Date.now() - 7)
+                                ReqDiscountProduct(req.body.deviceId, 'show-voucher');
+                            else {
+                                ReqDiscountProduct(req.body.deviceId, 'show-relate-product');
                             }
+                        } else {
+                            ReqDiscountProduct(req.body.deviceId, 'show-relate-product');
                         }
                     }
                     return res.status(200).json({ message: 'Success' });
@@ -135,6 +115,7 @@ class GuestController {
                     return res.status(500).json({ error: 'internal_error' });
                 }
             }
+
             return res.status(500).json({ error: 'internal_error' });
         } catch (error) {
             console.log(error.message);
