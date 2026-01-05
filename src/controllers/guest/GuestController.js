@@ -56,7 +56,7 @@ class GuestController {
     async webhookInsight(req, res) {
         try {
             const webhookData = req.body;
-
+            console.log(webhookData);
             webhookData.forEach((event) => {
                 const payload = JSON.parse(event.PayloadCurrentValue);
                 const product = {
@@ -68,12 +68,15 @@ class GuestController {
                 globalProductCache.set(product.id, product);
             });
             const allProducts = Array.from(globalProductCache.values());
+            console.log('--------------------------------------------------------------------');
+            console.log(allProducts);
             listProductHotId = allProducts
                 .sort((a, b) => {
                     return a.rank - b.rank;
                 })
                 .slice(0, 4);
-
+            console.log('--------------------------------------------------------------------');
+            console.log(listProductHotId);
             return res.status(200).json({ message: 'Success' });
         } catch (error) {
             return res.status(500).json({ error: 'internal_error' });
@@ -232,9 +235,11 @@ class GuestController {
     async findProductsHot(req, res) {
         try {
             req.body.listProductId = listProductHotId.find((item) => item.id);
+            console.log('req.body...', req.body.listProductId);
+
             const products = await ProductService.getProducts(req);
             if (products) {
-                return res.status(httpStatus.OK).json({ message: 'Success', products, listProductHotId });
+                return res.status(httpStatus.OK).json({ message: 'Success', products });
             } else {
                 return res.status(httpStatus.NOT_FOUND).json({ message: 'Not Found' });
             }
