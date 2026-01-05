@@ -48,8 +48,9 @@ class GuestService {
                 )
                 .sort((a, b) => b.count__c - a.count__c)
                 .slice(0, 1);
-
-            ReqDiscountProduct(req.body.deviceId, whitelist);
+            if (whitelist) {
+                ReqDiscountProduct(req.body.deviceId, whitelist);
+            }
         } catch (e) {
             console.log(e.message);
         }

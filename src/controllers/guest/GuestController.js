@@ -136,7 +136,6 @@ class GuestController {
                                     });
                                 }
                             });
-                            console.log(results);
                             const isPass = results.find(
                                 (item) => item.deviceId == req.body.deviceId && item.productId == req.body.productId,
                             );
@@ -147,7 +146,6 @@ class GuestController {
                             }
                         }
                     }
-                    console.log('abcxyz');
                     //after check insight
                     if (req.body.deviceId && req.body.productId) {
                         const isOrder = resStreamInsight.data.data.find(
