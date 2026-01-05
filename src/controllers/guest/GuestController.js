@@ -107,7 +107,7 @@ class GuestController {
                                 ReqDiscountProduct(req.body.deviceId, 'show-relate-product');
                             }
                         } else {
-                            ReqDiscountProduct(req.body.deviceId, 'show-relate-product');
+                            ReqDiscountProduct(req.body.deviceId, 'show-voucher');
                         }
                     }
                     return res.status(200).json({ message: 'Success' });
