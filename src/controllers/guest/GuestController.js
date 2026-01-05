@@ -76,7 +76,7 @@ class GuestController {
             return res.status(500).json({ error: 'internal_error' });
         }
     }
-    findProductRelated = (req, resStreamInsight) => {
+    findProductRelated(req, resStreamInsight) {
         const blacklistId = new Set(
             resStreamInsight.data.data
                 .filter((item) => item.type__c === 'Order' && item.data_graph_dimension__c == req.body.deviceId)
@@ -94,7 +94,7 @@ class GuestController {
             .slice(0, 1);
 
         ReqDiscountProduct(req.body.deviceId, whitelist);
-    };
+    }
     async checkWebEngagement(req, res) {
         try {
             //
